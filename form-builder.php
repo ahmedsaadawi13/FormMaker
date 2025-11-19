@@ -31,18 +31,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
     if ($action === 'save_form') {
-        $name = $_POST['form_name'];
-        $description = $_POST['form_description'];
+        $name = trim($_POST['form_name']);
+        $description = trim($_POST['form_description']);
         $status = $_POST['form_status'];
 
-        if ($formId > 0) {
-            $formModel->updateForm($formId, $name, $description, $status);
-            $message = "Form updated successfully!";
+        // Validate input
+        if (empty($name)) {
+            $error = "Form name is required!";
         } else {
-            $newFormId = $formModel->createForm(Auth::id(), $name, $description, $status);
-            if ($newFormId) {
-                header("Location: form-builder.php?id=$newFormId&msg=created");
-                exit;
+            if ($formId > 0) {
+                if ($formModel->updateForm($formId, $name, $description, $status)) {
+                    header("Location: form-builder.php?id=$formId&msg=updated");
+                    exit;
+                } else {
+                    $error = "Failed to update form. Please try again.";
+                }
+            } else {
+                $newFormId = $formModel->createForm(Auth::id(), $name, $description, $status);
+                if ($newFormId) {
+                    header("Location: form-builder.php?id=$newFormId&msg=created");
+                    exit;
+                } else {
+                    $error = "Failed to create form. Database error: " . $formModel->getError();
+                }
             }
         }
     } elseif ($action === 'add_field') {
@@ -72,6 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 $availableTypes = $fieldModel->getAvailableFieldTypes();
 $message = isset($_GET['msg']) ? $_GET['msg'] : '';
+if (!isset($error)) {
+    $error = '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -109,10 +123,17 @@ $message = isset($_GET['msg']) ? $_GET['msg'] : '';
                 <?php
                 switch ($message) {
                     case 'created': echo 'Form created successfully!'; break;
+                    case 'updated': echo 'Form updated successfully!'; break;
                     case 'field_added': echo 'Field added successfully!'; break;
                     case 'field_deleted': echo 'Field deleted successfully!'; break;
                 }
                 ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($error): ?>
+            <div class="message error">
+                <strong>Error:</strong> <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
 

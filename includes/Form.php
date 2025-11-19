@@ -104,4 +104,11 @@ class Form {
         $result = $this->db->fetch($sql, array(':form_id' => $formId));
         return $result ? $result['count'] : 0;
     }
+
+    /**
+     * Get last database error
+     */
+    public function getError() {
+        return $this->db->getError();
+    }
 }
