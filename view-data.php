@@ -125,7 +125,7 @@ $message = isset($_GET['msg']) ? $_GET['msg'] : '';
                                         }
                                     }
                                 ?>
-                                    <td><?php echo htmlspecialchars($value); ?></td>
+                                    <td><?php echo htmlspecialchars($value ?? ''); ?></td>
                                 <?php endforeach; ?>
                                 <td>
                                     <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this submission?');">

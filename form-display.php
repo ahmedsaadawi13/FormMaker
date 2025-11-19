@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_form'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($form['name']); ?> - <?php echo APP_NAME; ?></title>
+    <title><?php echo htmlspecialchars($form['name'] ?? 'Form'); ?> - <?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -79,10 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_form'])) {
                     <a href="form-display.php?form_id=<?php echo $formId; ?>" class="btn">Submit Another Response</a>
                 </div>
             <?php else: ?>
-                <h1><?php echo htmlspecialchars($form['name']); ?></h1>
+                <h1><?php echo htmlspecialchars($form['name'] ?? 'Form'); ?></h1>
 
-                <?php if ($form['description']): ?>
-                    <p class="form-description"><?php echo nl2br(htmlspecialchars($form['description'])); ?></p>
+                <?php if (!empty($form['description'])): ?>
+                    <p class="form-description"><?php echo nl2br(htmlspecialchars($form['description'] ?? '')); ?></p>
                 <?php endif; ?>
 
                 <?php if (!empty($errors)): ?>
@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_form'])) {
                                         placeholder="<?php echo htmlspecialchars($field['placeholder'] ?? ''); ?>"
                                         <?php echo $required; ?>
                                         <?php if (!empty($field['validation_pattern'])): ?>
-                                            pattern="<?php echo htmlspecialchars($field['validation_pattern']); ?>"
+                                            pattern="<?php echo htmlspecialchars($field['validation_pattern'] ?? ''); ?>"
                                         <?php endif; ?>>
                             <?php
                                     break;
@@ -198,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_form'])) {
                             ?>
 
                             <?php if (!empty($field['help_text'])): ?>
-                                <small class="help-text"><?php echo htmlspecialchars($field['help_text']); ?></small>
+                                <small class="help-text"><?php echo htmlspecialchars($field['help_text'] ?? ''); ?></small>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>

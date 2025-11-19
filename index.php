@@ -117,7 +117,7 @@ $message = isset($_GET['msg']) ? $_GET['msg'] : '';
                 <div class="stat-content">
                     <h3>Most Popular Form</h3>
                     <?php if ($mostPopularForm): ?>
-                        <p class="stat-text"><?php echo htmlspecialchars($mostPopularForm['name']); ?></p>
+                        <p class="stat-text"><?php echo htmlspecialchars($mostPopularForm['name'] ?? ''); ?></p>
                         <small><?php echo $maxSubmissions; ?> submissions</small>
                     <?php else: ?>
                         <p class="stat-text">No forms yet</p>
@@ -168,14 +168,14 @@ $message = isset($_GET['msg']) ? $_GET['msg'] : '';
                 ?>
                     <div class="form-card">
                         <div class="form-card-header">
-                            <h3><?php echo htmlspecialchars($form['name']); ?></h3>
+                            <h3><?php echo htmlspecialchars($form['name'] ?? 'Untitled Form'); ?></h3>
                             <span class="status-badge status-<?php echo $form['status']; ?>">
                                 <?php echo ucfirst($form['status']); ?>
                             </span>
                         </div>
 
-                        <?php if ($form['description']): ?>
-                            <p class="form-description"><?php echo htmlspecialchars($form['description']); ?></p>
+                        <?php if (!empty($form['description'])): ?>
+                            <p class="form-description"><?php echo htmlspecialchars($form['description'] ?? ''); ?></p>
                         <?php endif; ?>
 
                         <div class="form-stats">
