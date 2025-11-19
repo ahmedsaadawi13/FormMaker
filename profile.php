@@ -93,14 +93,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
                             <input type="tel" id="phone" name="phone"
-                                   value="<?php echo $profile ? htmlspecialchars($profile['phone']) : ''; ?>"
+                                   value="<?php echo htmlspecialchars($profile['phone'] ?? ''); ?>"
                                    placeholder="+1 (555) 123-4567">
                         </div>
 
                         <div class="form-group">
                             <label for="company">Company</label>
                             <input type="text" id="company" name="company"
-                                   value="<?php echo $profile ? htmlspecialchars($profile['company']) : ''; ?>"
+                                   value="<?php echo htmlspecialchars($profile['company'] ?? ''); ?>"
                                    placeholder="Your company name">
                         </div>
                     </div>
@@ -108,20 +108,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                     <div class="form-group">
                         <label for="website">Website</label>
                         <input type="url" id="website" name="website"
-                               value="<?php echo $profile ? htmlspecialchars($profile['website']) : ''; ?>"
+                               value="<?php echo htmlspecialchars($profile['website'] ?? ''); ?>"
                                placeholder="https://example.com">
                     </div>
 
                     <div class="form-group">
                         <label for="bio">Bio</label>
                         <textarea id="bio" name="bio" rows="4"
-                                  placeholder="Tell us about yourself..."><?php echo $profile ? htmlspecialchars($profile['bio']) : ''; ?></textarea>
+                                  placeholder="Tell us about yourself..."><?php echo htmlspecialchars($profile['bio'] ?? ''); ?></textarea>
                     </div>
 
                     <div class="form-group">
                         <label for="address">Address</label>
                         <input type="text" id="address" name="address"
-                               value="<?php echo $profile ? htmlspecialchars($profile['address']) : ''; ?>"
+                               value="<?php echo htmlspecialchars($profile['address'] ?? ''); ?>"
                                placeholder="Street address">
                     </div>
 
@@ -129,14 +129,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                         <div class="form-group">
                             <label for="city">City</label>
                             <input type="text" id="city" name="city"
-                                   value="<?php echo $profile ? htmlspecialchars($profile['city']) : ''; ?>"
+                                   value="<?php echo htmlspecialchars($profile['city'] ?? ''); ?>"
                                    placeholder="Your city">
                         </div>
 
                         <div class="form-group">
                             <label for="country">Country</label>
                             <input type="text" id="country" name="country"
-                                   value="<?php echo $profile ? htmlspecialchars($profile['country']) : ''; ?>"
+                                   value="<?php echo htmlspecialchars($profile['country'] ?? ''); ?>"
                                    placeholder="Your country">
                         </div>
                     </div>

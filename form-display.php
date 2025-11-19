@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_form'])) {
 
                             <?php
                             $fieldName = 'field_' . $field['id'];
-                            $value = isset($_POST[$fieldName]) ? $_POST[$fieldName] : $field['default_value'];
+                            $value = isset($_POST[$fieldName]) ? $_POST[$fieldName] : ($field['default_value'] ?? '');
                             $required = $field['is_required'] ? 'required' : '';
 
                             switch ($field['field_type']):
@@ -119,9 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_form'])) {
                                     <textarea
                                         id="field_<?php echo $field['id']; ?>"
                                         name="<?php echo $fieldName; ?>"
-                                        placeholder="<?php echo htmlspecialchars($field['placeholder']); ?>"
+                                        placeholder="<?php echo htmlspecialchars($field['placeholder'] ?? ''); ?>"
                                         <?php echo $required; ?>
-                                        rows="5"><?php echo htmlspecialchars($value); ?></textarea>
+                                        rows="5"><?php echo htmlspecialchars($value ?? ''); ?></textarea>
                             <?php
                                     break;
 
@@ -186,10 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_form'])) {
                                         type="<?php echo $field['field_type']; ?>"
                                         id="field_<?php echo $field['id']; ?>"
                                         name="<?php echo $fieldName; ?>"
-                                        value="<?php echo htmlspecialchars($value); ?>"
-                                        placeholder="<?php echo htmlspecialchars($field['placeholder']); ?>"
+                                        value="<?php echo htmlspecialchars($value ?? ''); ?>"
+                                        placeholder="<?php echo htmlspecialchars($field['placeholder'] ?? ''); ?>"
                                         <?php echo $required; ?>
-                                        <?php if ($field['validation_pattern']): ?>
+                                        <?php if (!empty($field['validation_pattern'])): ?>
                                             pattern="<?php echo htmlspecialchars($field['validation_pattern']); ?>"
                                         <?php endif; ?>>
                             <?php
@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_form'])) {
                             endswitch;
                             ?>
 
-                            <?php if ($field['help_text']): ?>
+                            <?php if (!empty($field['help_text'])): ?>
                                 <small class="help-text"><?php echo htmlspecialchars($field['help_text']); ?></small>
                             <?php endif; ?>
                         </div>
