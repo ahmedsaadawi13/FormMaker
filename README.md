@@ -293,7 +293,7 @@ For issues and questions, please check the documentation or contact the developm
 
 ## Version
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **PHP Version:** 7.0.33
 **Database:** MySQL
 **Last Updated:** 2025
