@@ -1,0 +1,31 @@
+# IDE and Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+
+# Config files (may contain sensitive data)
+# config.php
+
+# Log files
+*.log
+error_log
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Cache directories
+cache/
+tmp/
+
+# Uploaded files (if added later)
+uploads/
+files/
+
+# Database backups
+*.sql.gz
+*.sql.bak
+backup/
