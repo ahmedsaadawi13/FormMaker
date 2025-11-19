@@ -5,9 +5,12 @@
  */
 
 require_once 'config.php';
+require_once 'includes/Auth.php';
 require_once 'includes/Form.php';
 require_once 'includes/FormField.php';
 require_once 'includes/FormSubmission.php';
+
+Auth::require_auth();
 
 $formModel = new Form();
 $fieldModel = new FormField();
@@ -20,9 +23,9 @@ if ($formId <= 0) {
     die("Invalid form ID.");
 }
 
-$form = $formModel->getFormById($formId);
+$form = $formModel->getFormById($formId, Auth::id());
 if (!$form) {
-    die("Form not found.");
+    die("Form not found or you don't have permission to export it.");
 }
 
 $fields = $fieldModel->getFieldsByFormId($formId);

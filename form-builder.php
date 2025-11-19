@@ -5,8 +5,11 @@
  */
 
 require_once 'config.php';
+require_once 'includes/Auth.php';
 require_once 'includes/Form.php';
 require_once 'includes/FormField.php';
+
+Auth::require_auth();
 
 $formModel = new Form();
 $fieldModel = new FormField();
@@ -16,7 +19,10 @@ $form = null;
 $fields = array();
 
 if ($formId > 0) {
-    $form = $formModel->getFormById($formId);
+    $form = $formModel->getFormById($formId, Auth::id());
+    if (!$form) {
+        die("Form not found or you don't have permission to edit it.");
+    }
     $fields = $fieldModel->getFieldsByFormId($formId);
 }
 
@@ -33,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $formModel->updateForm($formId, $name, $description, $status);
             $message = "Form updated successfully!";
         } else {
-            $newFormId = $formModel->createForm($name, $description, $status);
+            $newFormId = $formModel->createForm(Auth::id(), $name, $description, $status);
             if ($newFormId) {
                 header("Location: form-builder.php?id=$newFormId&msg=created");
                 exit;
@@ -78,13 +84,23 @@ $message = isset($_GET['msg']) ? $_GET['msg'] : '';
 <body>
     <div class="container">
         <header>
-            <h1><?php echo APP_NAME; ?></h1>
+            <div class="header-content">
+                <h1><?php echo APP_NAME; ?></h1>
+                <div class="user-info">
+                    <?php if (Auth::picture()): ?>
+                        <img src="<?php echo htmlspecialchars(Auth::picture()); ?>" alt="Profile" class="user-avatar">
+                    <?php endif; ?>
+                    <span><?php echo htmlspecialchars(Auth::name()); ?></span>
+                </div>
+            </div>
             <nav>
                 <a href="index.php">Dashboard</a>
                 <?php if ($formId > 0): ?>
                     <a href="view-data.php?form_id=<?php echo $formId; ?>">View Data</a>
                     <a href="form-display.php?form_id=<?php echo $formId; ?>" target="_blank">Preview Form</a>
                 <?php endif; ?>
+                <a href="profile.php">My Profile</a>
+                <a href="logout.php" class="btn btn-danger btn-sm">Logout</a>
             </nav>
         </header>
 

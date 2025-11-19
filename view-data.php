@@ -5,9 +5,12 @@
  */
 
 require_once 'config.php';
+require_once 'includes/Auth.php';
 require_once 'includes/Form.php';
 require_once 'includes/FormField.php';
 require_once 'includes/FormSubmission.php';
+
+Auth::require_auth();
 
 $formModel = new Form();
 $fieldModel = new FormField();
@@ -19,7 +22,10 @@ $fields = array();
 $submissions = array();
 
 if ($formId > 0) {
-    $form = $formModel->getFormById($formId);
+    $form = $formModel->getFormById($formId, Auth::id());
+    if (!$form) {
+        die("Form not found or you don't have permission to view it.");
+    }
     $fields = $fieldModel->getFieldsByFormId($formId);
     $submissions = $submissionModel->getFormSubmissionsWithData($formId);
 } else {
@@ -47,13 +53,23 @@ $message = isset($_GET['msg']) ? $_GET['msg'] : '';
 <body>
     <div class="container">
         <header>
-            <h1>Form Submissions: <?php echo htmlspecialchars($form['name']); ?></h1>
+            <div class="header-content">
+                <h1>Form Submissions: <?php echo htmlspecialchars($form['name']); ?></h1>
+                <div class="user-info">
+                    <?php if (Auth::picture()): ?>
+                        <img src="<?php echo htmlspecialchars(Auth::picture()); ?>" alt="Profile" class="user-avatar">
+                    <?php endif; ?>
+                    <span><?php echo htmlspecialchars(Auth::name()); ?></span>
+                </div>
+            </div>
             <nav>
                 <a href="index.php">Dashboard</a>
                 <a href="form-builder.php?id=<?php echo $formId; ?>">Edit Form</a>
                 <a href="form-display.php?form_id=<?php echo $formId; ?>" target="_blank">View Form</a>
                 <a href="export.php?form_id=<?php echo $formId; ?>&format=csv" class="btn btn-success">Export CSV</a>
                 <a href="export.php?form_id=<?php echo $formId; ?>&format=json" class="btn btn-success">Export JSON</a>
+                <a href="profile.php">My Profile</a>
+                <a href="logout.php" class="btn btn-danger btn-sm">Logout</a>
             </nav>
         </header>
 

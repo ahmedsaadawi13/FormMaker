@@ -5,14 +5,45 @@ CREATE DATABASE IF NOT EXISTS formmaker CHARACTER SET utf8mb4 COLLATE utf8mb4_un
 
 USE formmaker;
 
+-- Users table: stores user accounts with Google OAuth
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    google_id VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    picture VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_google_id (google_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- User profiles: stores additional user identity information
+CREATE TABLE IF NOT EXISTS user_profiles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    phone VARCHAR(50),
+    company VARCHAR(255),
+    website VARCHAR(255),
+    bio TEXT,
+    address TEXT,
+    city VARCHAR(100),
+    country VARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Forms table: stores form definitions
 CREATE TABLE IF NOT EXISTS forms (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     status ENUM('active', 'inactive') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user (user_id),
     INDEX idx_status (status),
     INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -61,13 +92,4 @@ CREATE TABLE IF NOT EXISTS submission_data (
     INDEX idx_field (field_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insert sample form for testing
-INSERT INTO forms (name, description, status) VALUES
-('Contact Form', 'A simple contact form example', 'active');
-
--- Insert sample fields for the contact form
-INSERT INTO form_fields (form_id, field_name, field_label, field_type, is_required, placeholder, field_order) VALUES
-(1, 'name', 'Full Name', 'text', 1, 'Enter your full name', 1),
-(1, 'email', 'Email Address', 'email', 1, 'your@email.com', 2),
-(1, 'phone', 'Phone Number', 'tel', 0, '(555) 123-4567', 3),
-(1, 'message', 'Message', 'textarea', 1, 'Your message here...', 4);
+-- Note: Sample data will be created after first user registration

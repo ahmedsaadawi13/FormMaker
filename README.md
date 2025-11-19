@@ -1,8 +1,15 @@
 # FormMaker System
 
-A powerful and flexible form builder system built with PHP 7.0.33 and MySQL. Create custom forms, collect submissions, and export data with ease.
+A powerful and flexible form builder system built with PHP 7.0.33 and MySQL. Create custom forms, collect submissions, and export data with ease. Features Google OAuth authentication and user identity management.
 
 ## Features
+
+✅ **User Authentication**
+- Google OAuth 2.0 login
+- Secure session management
+- User profile with identity information
+- Each user has their own forms and data
+- Profile customization (phone, company, website, bio, address)
 
 ✅ **Form Builder Interface**
 - Create and edit forms with an intuitive interface
@@ -54,6 +61,8 @@ A powerful and flexible form builder system built with PHP 7.0.33 and MySQL. Cre
 - PHP 7.0.33 or higher
 - MySQL 5.6 or higher
 - Web server (Apache/Nginx)
+- cURL extension enabled
+- Google OAuth 2.0 credentials
 
 ### Setup Instructions
 
@@ -77,37 +86,62 @@ A powerful and flexible form builder system built with PHP 7.0.33 and MySQL. Cre
    define('DB_PASS', 'your_password');
    ```
 
-4. **Set proper permissions**
+4. **Set up Google OAuth**
+   Follow the detailed guide in [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md)
+
+   Quick steps:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project
+   - Enable Google+ API
+   - Create OAuth 2.0 credentials
+   - Copy Client ID and Client Secret
+   - Update config.php with your credentials:
+   ```php
+   define('GOOGLE_CLIENT_ID', 'your_client_id_here');
+   define('GOOGLE_CLIENT_SECRET', 'your_client_secret_here');
+   define('GOOGLE_REDIRECT_URI', 'http://localhost/formmaker/oauth-callback.php');
+   define('BASE_URL', 'http://localhost/formmaker');
+   ```
+
+5. **Set proper permissions**
    ```bash
    chmod 755 /var/www/html/formmaker
    chmod 644 /var/www/html/formmaker/*.php
    ```
 
-5. **Access the application**
+6. **Access the application**
    Open your browser and navigate to:
    ```
    http://localhost/formmaker/
    ```
+   You will be redirected to the login page to sign in with Google.
 
 ## File Structure
 
 ```
 FormMaker/
-├── config.php                  # Configuration file
+├── config.php                  # Configuration file (database + OAuth)
 ├── index.php                   # Dashboard (main page)
+├── login.php                   # Google OAuth login page
+├── logout.php                  # Logout handler
+├── oauth-callback.php          # Google OAuth callback handler
+├── profile.php                 # User profile/identity management
 ├── form-builder.php            # Create/edit forms
 ├── form-display.php            # Display forms to users
 ├── view-data.php               # View submissions
 ├── export.php                  # Export data (CSV/JSON)
-├── database.sql                # Database schema
+├── database.sql                # Database schema with users
 ├── includes/
 │   ├── Database.php            # Database connection class
+│   ├── Auth.php                # Authentication helper
+│   ├── User.php                # User model
 │   ├── Form.php                # Form model
 │   ├── FormField.php           # FormField model
 │   └── FormSubmission.php      # FormSubmission model
 ├── assets/
 │   └── style.css               # Stylesheet
-└── README.md                   # This file
+├── README.md                   # This file
+└── GOOGLE_OAUTH_SETUP.md       # Google OAuth setup guide
 ```
 
 ## Usage Guide

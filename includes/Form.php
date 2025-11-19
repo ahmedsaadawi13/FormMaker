@@ -14,26 +14,37 @@ class Form {
     }
 
     /**
-     * Get all forms
+     * Get all forms for a user
      */
-    public function getAllForms() {
-        $sql = "SELECT * FROM forms ORDER BY created_at DESC";
-        return $this->db->fetchAll($sql);
+    public function getAllForms($userId = null) {
+        if ($userId) {
+            $sql = "SELECT * FROM forms WHERE user_id = :user_id ORDER BY created_at DESC";
+            return $this->db->fetchAll($sql, array(':user_id' => $userId));
+        } else {
+            $sql = "SELECT * FROM forms ORDER BY created_at DESC";
+            return $this->db->fetchAll($sql);
+        }
     }
 
     /**
      * Get form by ID
      */
-    public function getFormById($id) {
-        $sql = "SELECT * FROM forms WHERE id = :id";
-        return $this->db->fetch($sql, array(':id' => $id));
+    public function getFormById($id, $userId = null) {
+        if ($userId) {
+            $sql = "SELECT * FROM forms WHERE id = :id AND user_id = :user_id";
+            return $this->db->fetch($sql, array(':id' => $id, ':user_id' => $userId));
+        } else {
+            $sql = "SELECT * FROM forms WHERE id = :id";
+            return $this->db->fetch($sql, array(':id' => $id));
+        }
     }
 
     /**
      * Create new form
      */
-    public function createForm($name, $description = '', $status = 'active') {
+    public function createForm($userId, $name, $description = '', $status = 'active') {
         $data = array(
+            'user_id' => $userId,
             'name' => $name,
             'description' => $description,
             'status' => $status
@@ -56,8 +67,21 @@ class Form {
     /**
      * Delete form
      */
-    public function deleteForm($id) {
-        return $this->db->delete('forms', 'id = :id', array(':id' => $id));
+    public function deleteForm($id, $userId = null) {
+        if ($userId) {
+            return $this->db->delete('forms', 'id = :id AND user_id = :user_id', array(':id' => $id, ':user_id' => $userId));
+        } else {
+            return $this->db->delete('forms', 'id = :id', array(':id' => $id));
+        }
+    }
+
+    /**
+     * Check if user owns form
+     */
+    public function userOwnsForm($formId, $userId) {
+        $sql = "SELECT COUNT(*) as count FROM forms WHERE id = :id AND user_id = :user_id";
+        $result = $this->db->fetch($sql, array(':id' => $formId, ':user_id' => $userId));
+        return $result && $result['count'] > 0;
     }
 
     /**

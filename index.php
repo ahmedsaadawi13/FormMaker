@@ -5,15 +5,18 @@
  */
 
 require_once 'config.php';
+require_once 'includes/Auth.php';
 require_once 'includes/Form.php';
 
+Auth::require_auth();
+
 $formModel = new Form();
-$forms = $formModel->getAllForms();
+$forms = $formModel->getAllForms(Auth::id());
 
 // Handle delete form
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_form'])) {
     $formId = (int)$_POST['form_id'];
-    $formModel->deleteForm($formId);
+    $formModel->deleteForm($formId, Auth::id());
     header("Location: index.php?msg=deleted");
     exit;
 }
@@ -31,8 +34,26 @@ $message = isset($_GET['msg']) ? $_GET['msg'] : '';
 <body>
     <div class="container">
         <header>
-            <h1><?php echo APP_NAME; ?></h1>
-            <p class="subtitle">Design, manage, and track your forms</p>
+            <div class="header-content">
+                <div>
+                    <h1><?php echo APP_NAME; ?></h1>
+                    <p class="subtitle">Design, manage, and track your forms</p>
+                </div>
+                <div class="user-info">
+                    <?php if (Auth::picture()): ?>
+                        <img src="<?php echo htmlspecialchars(Auth::picture()); ?>" alt="Profile" class="user-avatar">
+                    <?php endif; ?>
+                    <div class="user-details">
+                        <strong><?php echo htmlspecialchars(Auth::name()); ?></strong>
+                        <span><?php echo htmlspecialchars(Auth::email()); ?></span>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <a href="index.php">Dashboard</a>
+                <a href="profile.php">My Profile</a>
+                <a href="logout.php" class="btn btn-danger btn-sm">Logout</a>
+            </nav>
         </header>
 
         <?php if ($message === 'deleted'): ?>
