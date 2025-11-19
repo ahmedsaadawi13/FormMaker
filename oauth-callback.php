@@ -26,17 +26,24 @@ $postData = array(
     'grant_type' => 'authorization_code'
 );
 
-$ch = curl_init($tokenUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For development only
+// Use file_get_contents instead of cURL (works without extensions)
+$options = array(
+    'http' => array(
+        'method' => 'POST',
+        'header' => 'Content-Type: application/x-www-form-urlencoded',
+        'content' => http_build_query($postData),
+        'ignore_errors' => true
+    ),
+    'ssl' => array(
+        'verify_peer' => false,
+        'verify_peer_name' => false
+    )
+);
 
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
+$context = stream_context_create($options);
+$response = file_get_contents($tokenUrl, false, $context);
 
-if ($httpCode !== 200) {
+if ($response === false) {
     header('Location: login.php?error=token_failed');
     exit;
 }
@@ -44,7 +51,7 @@ if ($httpCode !== 200) {
 $tokenData = json_decode($response, true);
 
 if (!isset($tokenData['access_token'])) {
-    header('Location: login.php?error=no_token');
+    header('Location: login.php?error=no_token&details=' . urlencode($response));
     exit;
 }
 
@@ -53,18 +60,22 @@ $accessToken = $tokenData['access_token'];
 // Get user info from Google
 $userInfoUrl = 'https://www.googleapis.com/oauth2/v2/userinfo';
 
-$ch = curl_init($userInfoUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'Authorization: Bearer ' . $accessToken
-));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For development only
+$options = array(
+    'http' => array(
+        'method' => 'GET',
+        'header' => 'Authorization: Bearer ' . $accessToken,
+        'ignore_errors' => true
+    ),
+    'ssl' => array(
+        'verify_peer' => false,
+        'verify_peer_name' => false
+    )
+);
 
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
+$context = stream_context_create($options);
+$response = file_get_contents($userInfoUrl, false, $context);
 
-if ($httpCode !== 200) {
+if ($response === false) {
     header('Location: login.php?error=userinfo_failed');
     exit;
 }

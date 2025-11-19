@@ -10,6 +10,37 @@ require_once 'includes/Auth.php';
 // Redirect if already logged in
 Auth::redirect_if_authenticated();
 
+// Handle error messages
+$error = '';
+$msg = '';
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'no_code':
+            $error = 'No authorization code received from Google.';
+            break;
+        case 'token_failed':
+            $error = 'Failed to exchange authorization code for access token.';
+            break;
+        case 'no_token':
+            $error = 'No access token received from Google.';
+            break;
+        case 'userinfo_failed':
+            $error = 'Failed to get user information from Google.';
+            break;
+        case 'db_failed':
+            $error = 'Failed to create user account in database.';
+            break;
+        default:
+            $error = 'An error occurred during login. Please try again.';
+    }
+}
+
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'logged_out') {
+        $msg = 'You have been logged out successfully.';
+    }
+}
+
 // Generate Google OAuth URL
 $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
     'client_id' => GOOGLE_CLIENT_ID,
@@ -114,6 +145,18 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
         <div class="login-box">
             <h1><?php echo APP_NAME; ?></h1>
             <p>Sign in with your Google account to get started</p>
+
+            <?php if ($error): ?>
+                <div class="message error" style="margin-bottom: 20px;">
+                    <strong>Error:</strong> <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($msg): ?>
+                <div class="message success" style="margin-bottom: 20px;">
+                    <?php echo htmlspecialchars($msg); ?>
+                </div>
+            <?php endif; ?>
 
             <a href="<?php echo htmlspecialchars($googleAuthUrl); ?>" class="google-btn">
                 <svg class="google-icon" viewBox="0 0 24 24">
