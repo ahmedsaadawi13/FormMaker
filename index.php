@@ -21,6 +21,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_form'])) {
     exit;
 }
 
+// Calculate dashboard statistics
+$totalForms = count($forms);
+$totalSubmissions = 0;
+$activeForms = 0;
+$inactiveForms = 0;
+$mostPopularForm = null;
+$maxSubmissions = 0;
+$recentFormCount = 0;
+$thirtyDaysAgo = date('Y-m-d H:i:s', strtotime('-30 days'));
+
+foreach ($forms as $form) {
+    $submissionsCount = $formModel->getSubmissionsCount($form['id']);
+    $totalSubmissions += $submissionsCount;
+
+    if ($form['status'] === 'active') {
+        $activeForms++;
+    } else {
+        $inactiveForms++;
+    }
+
+    // Find most popular form
+    if ($submissionsCount > $maxSubmissions) {
+        $maxSubmissions = $submissionsCount;
+        $mostPopularForm = $form;
+    }
+
+    // Count recent forms (created in last 30 days)
+    if ($form['created_at'] >= $thirtyDaysAgo) {
+        $recentFormCount++;
+    }
+}
+
 $message = isset($_GET['msg']) ? $_GET['msg'] : '';
 ?>
 <!DOCTYPE html>
@@ -59,6 +91,70 @@ $message = isset($_GET['msg']) ? $_GET['msg'] : '';
         <?php if ($message === 'deleted'): ?>
             <div class="message success">Form deleted successfully!</div>
         <?php endif; ?>
+
+        <!-- Dashboard Statistics -->
+        <div class="stats-dashboard">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon">📋</div>
+                <div class="stat-content">
+                    <h3>Total Forms</h3>
+                    <p class="stat-number"><?php echo $totalForms; ?></p>
+                    <small><?php echo $activeForms; ?> active, <?php echo $inactiveForms; ?> inactive</small>
+                </div>
+            </div>
+
+            <div class="stat-card stat-success">
+                <div class="stat-icon">📝</div>
+                <div class="stat-content">
+                    <h3>Total Entries</h3>
+                    <p class="stat-number"><?php echo $totalSubmissions; ?></p>
+                    <small>Across all forms</small>
+                </div>
+            </div>
+
+            <div class="stat-card stat-info">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                    <h3>Most Popular Form</h3>
+                    <?php if ($mostPopularForm): ?>
+                        <p class="stat-text"><?php echo htmlspecialchars($mostPopularForm['name']); ?></p>
+                        <small><?php echo $maxSubmissions; ?> submissions</small>
+                    <?php else: ?>
+                        <p class="stat-text">No forms yet</p>
+                        <small>Create your first form</small>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="stat-card stat-warning">
+                <div class="stat-icon">🕒</div>
+                <div class="stat-content">
+                    <h3>Recent Activity</h3>
+                    <p class="stat-number"><?php echo $recentFormCount; ?></p>
+                    <small>Forms created in last 30 days</small>
+                </div>
+            </div>
+
+            <?php if ($totalForms > 0): ?>
+                <div class="stat-card stat-secondary">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <h3>Average Entries</h3>
+                        <p class="stat-number"><?php echo $totalForms > 0 ? round($totalSubmissions / $totalForms, 1) : 0; ?></p>
+                        <small>Per form</small>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-accent">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <h3>Active Rate</h3>
+                        <p class="stat-number"><?php echo round(($activeForms / $totalForms) * 100); ?>%</p>
+                        <small><?php echo $activeForms; ?> of <?php echo $totalForms; ?> forms active</small>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
 
         <div class="dashboard-header">
             <h2>Your Forms</h2>
